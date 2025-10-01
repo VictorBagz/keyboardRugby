@@ -23,6 +23,24 @@
             --text-muted: #8B9EB3;
             --success: #00D084;
             --warning: #FFB800;
+            --overlay-bg: rgba(10, 22, 40, 0.95);
+            --card-hover: rgba(0, 102, 204, 0.2);
+        }
+
+        /* Light theme variables */
+        [data-theme="light"] {
+            --primary-blue: #0066CC;
+            --secondary-blue: #004C99;
+            --light-blue: #3399FF;
+            --accent-blue: #0066CC;
+            --dark-bg: #F5F8FA;
+            --card-bg: #FFFFFF;
+            --text-light: #1A2634;
+            --text-muted: #5A6B7F;
+            --success: #00C07A;
+            --warning: #FFB800;
+            --overlay-bg: rgba(245, 248, 250, 0.95);
+            --card-hover: rgba(0, 102, 204, 0.1);
         }
 
         body {
@@ -1074,12 +1092,59 @@
     right: -100%;
     width: 100%;
     height: 100%;
-    background: rgba(10, 22, 40, 0.95);
+    background: var(--overlay-bg);
     backdrop-filter: blur(10px);
     z-index: 1000;
     transition: right 0.3s ease-in-out;
     display: flex;
     justify-content: flex-end;
+}
+
+/* Theme Toggle Styles */
+.theme-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: var(--card-hover);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.theme-switch::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    background: var(--accent-blue);
+    transition: all 0.3s;
+}
+
+.theme-switch.active::after {
+    transform: translateX(30px);
+}
+
+.theme-icons {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--text-light);
+    font-size: 0.8rem;
+}
+
+#theme-toggle {
+    cursor: pointer;
+}
+
+#theme-toggle .theme-switch {
+    margin-left: auto;
 }
 
 .more-menu-overlay.active {
@@ -1179,6 +1244,34 @@
             const moreButton = document.querySelector('[data-page="more"]');
             const overlay = document.querySelector('.more-menu-overlay');
             const closeButton = document.querySelector('.close-menu');
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeSwitch = document.querySelector('.theme-switch');
+            
+            // Theme handling
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            if (currentTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeSwitch.classList.add('active');
+                themeToggle.querySelector('i:first-child').classList.replace('fa-moon', 'fa-sun');
+                themeToggle.querySelector('span').textContent = 'Light Mode';
+            }
+
+            themeToggle.addEventListener('click', function() {
+                const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                if (isLight) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'dark');
+                    themeSwitch.classList.remove('active');
+                    themeToggle.querySelector('i:first-child').classList.replace('fa-sun', 'fa-moon');
+                    themeToggle.querySelector('span').textContent = 'Dark Mode';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                    themeSwitch.classList.add('active');
+                    themeToggle.querySelector('i:first-child').classList.replace('fa-moon', 'fa-sun');
+                    themeToggle.querySelector('span').textContent = 'Light Mode';
+                }
+            });
 
             // Open menu
             moreButton.addEventListener('click', function() {
@@ -1243,10 +1336,10 @@
                     <i class="fas fa-trophy"></i>
                     <span>Uganda Cup</span>
                 </button>
-                <button class="tournament-btn" data-tournament="nile-special">
+                <a href="NSLeague.html" class="tournament-btn" data-tournament="nile-special">
                     <i class="fas fa-beer"></i>
                     <span>Nile Special League</span>
-                </button>
+                </a>
                 <button class="tournament-btn" data-tournament="sevens">
                     <i class="fas fa-running"></i>
                     <span>Sevens Circuit</span>
@@ -1732,6 +1825,16 @@
                 </button>
             </div>
             <div class="more-menu-items">
+                <div class="more-menu-item" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark Mode</span>
+                    <div class="theme-switch">
+                        <div class="theme-icons">
+                            <i class="fas fa-moon"></i>
+                            <i class="fas fa-sun"></i>
+                        </div>
+                    </div>
+                </div>
                 <a href="#settings" class="more-menu-item">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
