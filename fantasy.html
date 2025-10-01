@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Rugby Fantasy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0066CC;
+            --secondary-blue: #004C99;
+            --light-blue: #3399FF;
+            --accent-blue: #00BFFF;
+            --dark-bg: #0A1628;
+            --card-bg: #132337;
+            --text-light: #E8F1F8;
+            --text-muted: #8B9EB3;
+            --success: #00D084;
+            --warning: #FFB800;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0F1F35 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+        }
+
+        .balance {
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            border: none;
+            background: var(--card-bg);
+            color: var(--text-light);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            border-color: var(--accent-blue);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.4);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        .player-selection {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .player-card:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .player-card.selected {
+            border-color: var(--success);
+            background: rgba(0, 208, 132, 0.1);
+        }
+
+        .player-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .player-position {
+            background: var(--primary-blue);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .player-price {
+            color: var(--warning);
+            font-weight: 700;
+        }
+
+        .pitch {
+            background: linear-gradient(135deg, #1a5c2e 0%, #2d8a4e 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            min-height: 600px;
+        }
+
+        .pitch-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 50px,
+                rgba(255, 255, 255, 0.1) 50px,
+                rgba(255, 255, 255, 0.1) 52px
+            );
+            border-radius: 20px;
+        }
+
+        .formation {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .formation-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .player-slot {
+            background: rgba(255, 255, 255, 0.9);
+            color: #0A1628;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 100px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .player-slot:hover {
+            transform: scale(1.05);
+        }
+
+        .player-slot.filled {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+            color: white;
+        }
+
+        .league-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .league-info h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .league-stats {
+            display: flex;
+            gap: 1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .leaderboard {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .leaderboard table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard th {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .leaderboard td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .leaderboard tr:hover {
+            background: rgba(0, 102, 204, 0.1);
+        }
+
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .formation-row {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .player-slot {
+                min-width: 80px;
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-trophy"></i>
+                    <h1>Keyboard Rugby Fantasy</h1>
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
+                    <span id="username">Guest Player</span>
+                    <span class="balance">$<span id="budget">100.0</span>M</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="my-team">
+                <i class="fas fa-users"></i> My Team
+            </button>
+            <button class="tab-btn" data-tab="leagues">
+                <i class="fas fa-trophy"></i> My Leagues
+            </button>
+            <button class="tab-btn" data-tab="transfers">
+                <i class="fas fa-exchange-alt"></i> Transfers
+            </button>
+            <button class="tab-btn" data-tab="stats">
+                <i class="fas fa-chart-line"></i> Stats
+            </button>
+        </div>
+
+        <!-- My Team Tab -->
+        <div class="tab-content active" id="my-team">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="team-points">0</div>
+                    <div class="stat-label">Total Points</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="team-rank">-</div>
+                    <div class="stat-label">Overall Rank</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="team-value">0</div>
+                    <div class="stat-label">Team Value</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="gameweek-points">0</div>
+                    <div class="stat-label">Gameweek Points</div>
+                </div>
+            </div>
+
+            <div class="pitch">
+                <div class="pitch-lines"></div>
+                <div class="formation">
+                    <div class="formation-row">
+                        <div class="player-slot" data-position="FB">
+                            <div>Fullback</div>
+                            <small>Select Player</small>
+                        </div>
+                    </div>
+                    <div class="formation-row">
+                        <div class="player-slot" data-position="W">Wing</div>
+                        <div class="player-slot" data-position="C">Centre</div>
+                        <div class="player-slot" data-position="C">Centre</div>
+                        <div class="player-slot" data-position="W">Wing</div>
+                    </div>
+                    <div class="formation-row">
+                        <div class="player-slot" data-position="FH">Fly-half</div>
+                        <div class="player-slot" data-position="SH">Scrum-half</div>
+                    </div>
+                    <div class="formation-row">
+                        <div class="player-slot" data-position="FR">Forward</div>
+                        <div class="player-slot" data-position="FR">Forward</div>
+                        <div class="player-slot" data-position="FR">Forward</div>
+                    </div>
+                    <div class="formation-row">
+                        <div class="player-slot" data-position="FR">Forward</div>
+                        <div class="player-slot" data-position="FR">Forward</div>
+                        <div class="player-slot" data-position="FR">Forward</div>
+                        <div class="player-slot" data-position="FR">Forward</div>
+                        <div class="player-slot" data-position="FR">Forward</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leagues Tab -->
+        <div class="tab-content" id="leagues">
+            <div class="grid">
+                <div class="card">
+                    <h3>Create New League</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Start your own fantasy league and invite friends to compete</p>
+                    <button class="btn btn-primary" onclick="openModal('create-league-modal')">
+                        <i class="fas fa-plus"></i> Create League
+                    </button>
+                </div>
+                <div class="card">
+                    <h3>Join League</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Enter a league code to join an existing league</p>
+                    <button class="btn btn-success" onclick="openModal('join-league-modal')">
+                        <i class="fas fa-sign-in-alt"></i> Join League
+                    </button>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem;">My Leagues</h3>
+            <div id="leagues-list">
+                <div class="league-item">
+                    <div class="league-info">
+                        <h4>Global Championship</h4>
+                        <div class="league-stats">
+                            <span><i class="fas fa-users"></i> 15,234 players</span>
+                            <span><i class="fas fa-trophy"></i> Public League</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="viewLeague('global')">View</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transfers Tab -->
+        <div class="tab-content" id="transfers">
+            <div class="card">
+                <h3>Player Market</h3>
+                <div class="form-group">
+                    <input type="text" id="player-search" placeholder="Search players..." oninput="filterPlayers()">
+                </div>
+                <div class="form-group">
+                    <select id="position-filter" onchange="filterPlayers()">
+                        <option value="">All Positions</option>
+                        <option value="FB">Fullback</option>
+                        <option value="W">Wing</option>
+                        <option value="C">Centre</option>
+                        <option value="FH">Fly-half</option>
+                        <option value="SH">Scrum-half</option>
+                        <option value="FR">Forward</option>
+                    </select>
+                </div>
+                <div id="players-list" class="player-selection"></div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="tab-content" id="stats">
+            <div class="leaderboard">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Team Name</th>
+                            <th>Manager</th>
+                            <th>Points</th>
+                            <th>This Week</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create League Modal -->
+    <div class="modal" id="create-league-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New League</h3>
+                <button class="close-modal" onclick="closeModal('create-league-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="createLeague(event)">
+                <div class="form-group">
+                    <label>League Name</label>
+                    <input type="text" id="league-name" required placeholder="e.g., Friends Championship">
+                </div>
+                <div class="form-group">
+                    <label>League Type</label>
+                    <select id="league-type">
+                        <option value="private">Private (Invite Only)</option>
+                        <option value="public">Public (Anyone can join)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Scoring System</label>
+                    <select id="scoring-system">
+                        <option value="standard">Standard Scoring</option>
+                        <option value="bonus">Bonus Points</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-check"></i> Create League
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Join League Modal -->
+    <div class="modal" id="join-league-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Join League</h3>
+                <button class="close-modal" onclick="closeModal('join-league-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="joinLeague(event)">
+                <div class="form-group">
+                    <label>League Code</label>
+                    <input type="text" id="league-code" required placeholder="Enter 6-digit code">
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Join League
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            budget: 100.0,
+            team: [],
+            leagues: [],
+            selectedPlayers: new Set()
+        };
+
+        // Sample players database
+        const players = [
+            { id: 1, name: 'Samuel Okello', position: 'FH', team: 'Jinja Rhinos', price: 8.5, points: 124 },
+            { id: 2, name: 'David Mwanje', position: 'FB', team: 'Kampala Kings', price: 9.0, points: 145 },
+            { id: 3, name: 'Patrick Tendo', position: 'W', team: 'Entebbe Warriors', price: 7.5, points: 98 },
+            { id: 4, name: 'Moses Kirunda', position: 'C', team: 'Gulu Giants', price: 8.0, points: 112 },
+            { id: 5, name: 'Isaac Mukasa', position: 'SH', team: 'Mbarara Bulls', price: 7.0, points: 87 },
+            { id: 6, name: 'John Ssemakula', position: 'FR', team: 'Kampala Kings', price: 6.5, points: 76 },
+            { id: 7, name: 'Peter Ochieng', position: 'FR', team: 'Jinja Rhinos', price: 6.0, points: 68 },
+            { id: 8, name: 'James Mulondo', position: 'W', team: 'Entebbe Warriors', price: 7.8, points: 95 },
+            { id: 9, name: 'Robert Kasozi', position: 'C', team: 'Gulu Giants', price: 8.2, points: 106 },
+            { id: 10, name: 'Andrew Kabuye', position: 'FR', team: 'Mbarara Bulls', price: 6.3, points: 72 }
+        ];
+
+        // Sample leaderboard data
+        const leaderboard = [
+            { rank: 1, team: 'Mighty Rhinos', manager: 'John Doe', points: 1245, weekly: 87 },
+            { rank: 2, team: 'Rugby Masters', manager: 'Jane Smith', points: 1198, weekly: 92 },
+            { rank: 3, team: 'The Forwards', manager: 'Mike Johnson', points: 1156, weekly: 78 },
+            { rank: 4, team: 'Try Scorers', manager: 'Sarah Williams', points: 1089, weekly: 85 },
+            { rank: 5, team: 'Scrum Kings', manager: 'David Brown', points: 1034, weekly: 71 }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupTabs();
+            renderPlayers();
+            renderLeaderboard();
+            setupPitchSlots();
+        });
+
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        function renderPlayers() {
+            const container = document.getElementById('players-list');
+            container.innerHTML = players.map(player => `
+                <div class="player-card ${gameState.selectedPlayers.has(player.id) ? 'selected' : ''}" 
+                     onclick="togglePlayer(${player.id})">
+                    <div class="player-info">
+                        <span class="player-position">${player.position}</span>
+                        <div>
+                            <div style="font-weight: 700;">${player.name}</div>
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">${player.team}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="player-price">$${player.price}M</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">${player.points} pts</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterPlayers() {
+            const search = document.getElementById('player-search').value.toLowerCase();
+            const position = document.getElementById('position-filter').value;
+            
+            const filtered = players.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(search) || p.team.toLowerCase().includes(search);
+                const matchesPosition = !position || p.position === position;
+                return matchesSearch && matchesPosition;
+            });
+            
+            const container = document.getElementById('players-list');
+            container.innerHTML = filtered.map(player => `
+                <div class="player-card ${gameState.selectedPlayers.has(player.id) ? 'selected' : ''}" 
+                     onclick="togglePlayer(${player.id})">
+                    <div class="player-info">
+                        <span class="player-position">${player.position}</span>
+                        <div>
+                            <div style="font-weight: 700;">${player.name}</div>
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">${player.team}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="player-price">$${player.price}M</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">${player.points} pts</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePlayer(playerId) {
+            const player = players.find(p => p.id === playerId);
+            
+            if (gameState.selectedPlayers.has(playerId)) {
+                gameState.selectedPlayers.delete(playerId);
+                gameState.budget += player.price;
+            } else {
+                if (gameState.budget >= player.price) {
+                    gameState.selectedPlayers.add(playerId);
+                    gameState.budget -= player.price;
+                } else {
+                    alert('Insufficient budget!');
+                    return;
+                }
+            }
+            
+            document.getElementById('budget').textContent = gameState.budget.toFixed(1);
+            renderPlayers();
+        }
+
+        function setupPitchSlots() {
+            document.querySelectorAll('.player-slot').forEach(slot => {
+                slot.addEventListener('click', () => {
+                    const position = slot.dataset.position;
+                    const availablePlayers = players.filter(p => p.position === position);
+                    
+                    if (availablePlayers.length > 0) {
+                        const player = availablePlayers[0];
+                        slot.classList.add('filled');
+                        slot.innerHTML = `
+                            <div style="font-weight: 700;">${player.name}</div>
+                            <small>${player.team}</small>
+                        `;
+                    }
+                });
+            });
+        }
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = leaderboard.map(entry => `
+                <tr>
+                    <td><span class="rank-badge">${entry.rank}</span></td>
+                    <td style="font-weight: 700;">${entry.team}</td>
+                    <td>${entry.manager}</td>
+                    <td style="color: var(--accent-blue); font-weight: 700;">${entry.points}</td>
+                    <td style="color: var(--success);">${entry.weekly}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // League management functions
+        function createLeague(event) {
+            event.preventDefault();
+            const leagueName = document.getElementById('league-name').value;
+            const leagueType = document.getElementById('league-type').value;
+            const scoringSystem = document.getElementById('scoring-system').value;
+            
+            const leagueCode = Math.floor(100000 + Math.random() * 900000);
+            
+            const newLeague = {
+                name: leagueName,
+                type: leagueType,
+                scoring: scoringSystem,
+                code: leagueCode,
+                members: 1
+            };
+            
+            gameState.leagues.push(newLeague);
+            
+            alert(`League created successfully! Your league code is: ${leagueCode}`);
+            closeModal('create-league-modal');
+            renderLeagues();
+        }
+
+        function joinLeague(event) {
+            event.preventDefault();
+            const code = document.getElementById('league-code').value;
+            
+            if (code.length === 6) {
+                alert('Successfully joined the league!');
+                closeModal('join-league-modal');
+            } else {
+                alert('Please enter a valid 6-digit code');
+            }
+        }
+
+        function viewLeague(leagueId) {
+            alert('Viewing league details...');
+        }
+
+        function renderLeagues() {
+            const container = document.getElementById('leagues-list');
+            const leaguesHTML = gameState.leagues.map(league => `
+                <div class="league-item">
+                    <div class="league-info">
+                        <h4>${league.name}</h4>
+                        <div class="league-stats">
+                            <span><i class="fas fa-users"></i> ${league.members} players</span>
+                            <span><i class="fas fa-${league.type === 'private' ? 'lock' : 'trophy'}"></i> ${league.type === 'private' ? 'Private' : 'Public'} League</span>
+                            <span><i class="fas fa-code"></i> Code: ${league.code}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="viewLeague('${league.code}')">View</button>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `
+                <div class="league-item">
+                    <div class="league-info">
+                        <h4>Global Championship</h4>
+                        <div class="league-stats">
+                            <span><i class="fas fa-users"></i> 15,234 players</span>
+                            <span><i class="fas fa-trophy"></i> Public League</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="viewLeague('global')">View</button>
+                </div>
+                ${leaguesHTML}
+            `;
+        }
+
+        // Event listeners
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
