@@ -53,13 +53,12 @@
 
         /* Header */
         header {
-            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
-            padding: 1.5rem 2rem;
-            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+    position: relative; /* Change to relative */
+    z-index: 100;
+}
 
         .header-content {
             max-width: 1400px;
@@ -175,6 +174,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
+            padding-top: 1rem;
         }
 
         /* Hero Section */
@@ -257,23 +257,17 @@
             display: flex;
             gap: 1rem;
             margin-bottom: 2rem;
+            margin-top: 2rem;
             overflow-x: auto;
-            padding-bottom: 1rem;
-            padding-right: 5px; /* Add padding for scrollbar */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+            position: relative;
+            z-index: 10;
         }
 
-        /* Tournament selector specific scrollbar */
+        /* Hide scrollbar for Chrome, Safari and Opera */
         .tournament-selector::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .tournament-selector::-webkit-scrollbar-track {
-            background: linear-gradient(90deg, rgba(0, 102, 204, 0.05) 0%, rgba(0, 191, 255, 0.05) 100%);
-        }
-
-        .tournament-selector::-webkit-scrollbar-thumb {
-            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
-            border: 2px solid var(--dark-bg);
+            display: none;
         }
 
         .tournament-btn {
@@ -291,6 +285,7 @@
             gap: 0.5rem;
             min-width: 120px;
             text-align: center;
+            text-decoration: none; /* Added for <a> tags */
         }
 
         .tournament-btn span {
@@ -565,7 +560,7 @@
 
         .standings-table td {
             padding: 1.2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .standings-table tr {
@@ -679,6 +674,20 @@
         .page-content {
             display: none;
         }
+
+        /* Tournament content within pages */
+.tournament-fixtures,
+.tournament-standings,
+.tournament-stats {
+    display: none;
+}
+
+.tournament-fixtures.active,
+.tournament-standings.active,
+.tournament-stats.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
 
         .page-content.active {
             display: block;
@@ -1249,23 +1258,25 @@
             
             // Theme handling
             const currentTheme = localStorage.getItem('theme') || 'dark';
+            const htmlElement = document.documentElement;
+
             if (currentTheme === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
+                htmlElement.setAttribute('data-theme', 'light');
                 themeSwitch.classList.add('active');
                 themeToggle.querySelector('i:first-child').classList.replace('fa-moon', 'fa-sun');
                 themeToggle.querySelector('span').textContent = 'Light Mode';
             }
 
             themeToggle.addEventListener('click', function() {
-                const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                const isLight = htmlElement.getAttribute('data-theme') === 'light';
                 if (isLight) {
-                    document.documentElement.removeAttribute('data-theme');
+                    htmlElement.removeAttribute('data-theme');
                     localStorage.setItem('theme', 'dark');
                     themeSwitch.classList.remove('active');
                     themeToggle.querySelector('i:first-child').classList.replace('fa-sun', 'fa-moon');
                     themeToggle.querySelector('span').textContent = 'Dark Mode';
                 } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
+                    htmlElement.setAttribute('data-theme', 'light');
                     localStorage.setItem('theme', 'light');
                     themeSwitch.classList.add('active');
                     themeToggle.querySelector('i:first-child').classList.replace('fa-moon', 'fa-sun');
@@ -1273,19 +1284,17 @@
                 }
             });
 
-            // Open menu
+            // More Menu handlers
             moreButton.addEventListener('click', function() {
                 overlay.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden';
             });
 
-            // Close menu
             closeButton.addEventListener('click', function() {
                 overlay.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
+                document.body.style.overflow = '';
             });
 
-            // Close menu when clicking outside
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) {
                     overlay.classList.remove('active');
@@ -1293,14 +1302,182 @@
                 }
             });
 
-            // Prevent closing when clicking inside menu content
             const menuContent = document.querySelector('.more-menu-content');
             menuContent.addEventListener('click', function(e) {
                 e.stopPropagation();
             });
+
+            // State management
+            let currentTournament = 'uganda-cup';
+            let currentPage = 'home';
+
+            // Tournament Selector Logic
+            const tournamentButtons = document.querySelectorAll('.tournament-selector .tournament-btn');
+            const tournamentContents = document.querySelectorAll('.tournament-content');
+
+            function changeTournament(tournamentId) {
+                currentTournament = tournamentId;
+                tournamentButtons.forEach(btn => btn.classList.remove('active'));
+                tournamentContents.forEach(content => content.classList.remove('active'));
+
+                const selectedButton = document.querySelector(`[data-tournament="${tournamentId}"]`);
+                if (selectedButton) {
+                    selectedButton.classList.add('active');
+                }
+
+                const selectedContent = document.getElementById(`${tournamentId}-content`);
+                if (selectedContent) {
+                    selectedContent.classList.add('active');
+                }
+
+                // Sync tournament selection on other pages
+                syncTournamentSelection(currentPage);
+            }
+
+            // Navigation Bar Logic
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageContents = document.querySelectorAll('.page-content');
+
+            function changePage(pageName) {
+                currentPage = pageName;
+                
+                navItems.forEach(item => item.classList.remove('active'));
+                const activeNav = document.querySelector(`[data-page="${pageName}"]`);
+                if (activeNav) {
+                    activeNav.classList.add('active');
+                }
+
+                pageContents.forEach(content => content.classList.remove('active'));
+                const activePage = document.getElementById(pageName);
+                if (activePage) {
+                    activePage.classList.add('active');
+                }
+
+                // Sync tournament selection on the new page
+                syncTournamentSelection(pageName);
+            }
+
+            // Handle tournament switching within Fixtures, Standings, and Stats pages
+            function syncTournamentSelection(pageName) {
+                if (pageName === 'fixtures') {
+                    const fixtureButtons = document.querySelectorAll('.fixtures-tournament');
+                    fixtureButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.getAttribute('data-tournament') === currentTournament) {
+                            btn.classList.add('active');
+                        }
+                    });
+                    updateFixturesContent(currentTournament);
+                } else if (pageName === 'standings') {
+                    const standingsButtons = document.querySelectorAll('.standings-tournament');
+                    standingsButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.getAttribute('data-tournament') === currentTournament) {
+                            btn.classList.add('active');
+                        }
+                    });
+                    updateStandingsContent(currentTournament);
+                } else if (pageName === 'stats') {
+                    const statsButtons = document.querySelectorAll('.stats-tournament');
+                    statsButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.getAttribute('data-tournament') === currentTournament) {
+                            btn.classList.add('active');
+                        }
+                    });
+                    updateStatsContent(currentTournament);
+                }
+            }
+
+            function updateFixturesContent(tournamentId) {
+                const fixturesContents = document.querySelectorAll('.tournament-fixtures');
+                fixturesContents.forEach(content => content.classList.remove('active'));
+                const activeContent = document.getElementById(`fixtures-${tournamentId}`);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+            }
+
+            function updateStandingsContent(tournamentId) {
+                const standingsContents = document.querySelectorAll('.tournament-standings');
+                standingsContents.forEach(content => content.classList.remove('active'));
+                const activeContent = document.getElementById(`standings-${tournamentId}`);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+            }
+
+            function updateStatsContent(tournamentId) {
+                const statsContents = document.querySelectorAll('.tournament-stats');
+                statsContents.forEach(content => content.classList.remove('active'));
+                const activeContent = document.getElementById(`stats-${tournamentId}`);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+            }
+
+            // Add click handlers
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // If it's a direct link (like news), let it handle navigation naturally
+                    if (this.tagName === 'A') {
+                        return;
+                    }
+                    const pageName = this.getAttribute('data-page');
+                    if (pageName && pageName !== 'more') {
+                        changePage(pageName);
+                    }
+                });
+            });
+
+            tournamentButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (this.tagName === 'A') {
+                        e.preventDefault();
+                    }
+                    const tournamentId = this.getAttribute('data-tournament');
+                    if (tournamentId) {
+                        changeTournament(tournamentId);
+                    }
+                });
+            });
+
+            // Add listeners to tournament selector buttons in each section
+            document.querySelectorAll('.fixtures-tournament').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tournamentId = this.getAttribute('data-tournament');
+                    currentTournament = tournamentId;
+                    document.querySelectorAll('.fixtures-tournament').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateFixturesContent(tournamentId);
+                });
+            });
+
+            document.querySelectorAll('.standings-tournament').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tournamentId = this.getAttribute('data-tournament');
+                    currentTournament = tournamentId;
+                    document.querySelectorAll('.standings-tournament').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateStandingsContent(tournamentId);
+                });
+            });
+
+            document.querySelectorAll('.stats-tournament').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tournamentId = this.getAttribute('data-tournament');
+                    currentTournament = tournamentId;
+                    document.querySelectorAll('.stats-tournament').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateStatsContent(tournamentId);
+                });
+            });
+
+            // Initialize
+            changeTournament('uganda-cup');
+            changePage('home');
         });
     </script>
-    <!-- Header -->
     <header>
         <div class="header-content">
             <div class="logo">
@@ -1317,11 +1494,8 @@
         </div>
     </header>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Home Page -->
         <div class="page-content active" id="home">
-            <!-- Hero Section -->
             <div class="hero" style="background-image: url('photos/DegziOnFire.jpg'); background-size: cover; background-position: center;">
                 <div class="hero-content">
                     <span class="hero-badge">BREAKING NEWS</span>
@@ -1330,16 +1504,58 @@
                 </div>
             </div>
 
-            <!-- Tournament Selector -->
+            <div class="section-header">
+                <h3><i class="fas fa-newspaper"></i> Latest News</h3>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="news-grid">
+                <div class="news-card">
+                    <div class="news-card-image" style="background-image: url('photos/PirartesCup.jpg')"></div>
+                    <div class="news-card-content">
+                        <span class="news-category">MATCH REPORT</span>
+                        <h4>Kampala Kings Crowned Champions</h4>
+                        <p>A sensational second-half performance saw Kampala Kings overturn a 14-point deficit to claim victory.</p>
+                        <div class="news-meta">
+                            <span><i class="far fa-clock"></i> 2 hours ago</span>
+                            <span><i class="far fa-eye"></i> 2.5k views</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <div class="news-card-image" style="background-image: url('photos/PiratesJerry.jpg')"></div>
+                    <div class="news-card-content">
+                        <span class="news-category">PLAYER SPOTLIGHT</span>
+                        <h4>Rising Star: Meet Samuel Okello</h4>
+                        <p>The young fly-half from Jinja Rhinos is taking the championship by storm with his exceptional playmaking.</p>
+                        <div class="news-meta">
+                            <span><i class="far fa-clock"></i> 5 hours ago</span>
+                            <span><i class="far fa-eye"></i> 1.8k views</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <div class="news-card-image" style="background-image: url('photos/PiratesSydo8.jpg')"></div>
+                    <div class="news-card-content">
+                        <span class="news-category">ANALYSIS</span>
+                        <h4>Title Race Intensifies</h4>
+                        <p>With four matches remaining, three teams are still in contention for the Uganda Cup trophy.</p>
+                        <div class="news-meta">
+                            <span><i class="far fa-clock"></i> 1 day ago</span>
+                            <span><i class="far fa-eye"></i> 3.2k views</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="tournament-selector">
-                <button class="tournament-btn active" data-tournament="uganda-cup">
+                <button class="tournament-btn" data-tournament="uganda-cup">
                     <i class="fas fa-trophy"></i>
                     <span>Uganda Cup</span>
                 </button>
-                <a href="NSLeague.html" class="tournament-btn" data-tournament="nile-special">
+                <button class="tournament-btn" data-tournament="nile-special">
                     <i class="fas fa-beer"></i>
                     <span>Nile Special League</span>
-                </a>
+                </button>
                 <button class="tournament-btn" data-tournament="sevens">
                     <i class="fas fa-running"></i>
                     <span>Sevens Circuit</span>
@@ -1354,9 +1570,7 @@
                 </button>
             </div>
 
-            <!-- Uganda Cup Content -->
             <div class="tournament-content active" id="uganda-cup-content">
-                <!-- Quick Stats -->
                 <div class="quick-stats">
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
@@ -1380,51 +1594,6 @@
                     </div>
                 </div>
 
-                <!-- Latest News -->
-                <div class="section-header">
-                    <h3><i class="fas fa-newspaper"></i> Latest News</h3>
-                    <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
-                </div>
-                <div class="news-grid">
-                    <div class="news-card">
-                        <div class="news-card-image" style="background-image: url('photos/PirartesCup.jpg')"></div>
-                        <div class="news-card-content">
-                            <span class="news-category">MATCH REPORT</span>
-                            <h4>Kampala Kings Crowned Champions</h4>
-                            <p>A sensational second-half performance saw Kampala Kings overturn a 14-point deficit to claim victory.</p>
-                            <div class="news-meta">
-                                <span><i class="far fa-clock"></i> 2 hours ago</span>
-                                <span><i class="far fa-eye"></i> 2.5k views</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="news-card">
-                        <div class="news-card-image" style="background-image: url('photos/PiratesJerry.jpg')"></div>
-                        <div class="news-card-content">
-                            <span class="news-category">PLAYER SPOTLIGHT</span>
-                            <h4>Rising Star: Meet Samuel Okello</h4>
-                            <p>The young fly-half from Jinja Rhinos is taking the championship by storm with his exceptional playmaking.</p>
-                            <div class="news-meta">
-                                <span><i class="far fa-clock"></i> 5 hours ago</span>
-                                <span><i class="far fa-eye"></i> 1.8k views</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="news-card">
-                        <div class="news-card-image" style="background-image: url('photos/PiratesSydo8.jpg')"></div>
-                        <div class="news-card-content">
-                            <span class="news-category">ANALYSIS</span>
-                            <h4>Title Race Intensifies</h4>
-                            <p>With four matches remaining, three teams are still in contention for the Uganda Cup trophy.</p>
-                            <div class="news-meta">
-                                <span><i class="far fa-clock"></i> 1 day ago</span>
-                                <span><i class="far fa-eye"></i> 3.2k views</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Today's Matches -->
                 <div class="section-header">
                     <h3><i class="fas fa-calendar-day"></i> Today's Matches</h3>
                     <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
@@ -1468,14 +1637,12 @@
                     </div>
                 </div>
                  
-                <!-- Pool Standings -->
                 <div class="section-header">
                     <h3><i class="fas fa-trophy"></i> Pool Standings</h3>
                     <a href="#" class="view-all">Full Tables <i class="fas fa-arrow-right"></i></a>
                 </div>
                 
                 <div class="pools-grid">
-                    <!-- Pool A -->
                     <div class="pool-table">
                         <div class="pool-header">Pool A</div>
                         <table>
@@ -1553,7 +1720,6 @@
                         </table>
                     </div>
 
-                    <!-- Pool B -->
                     <div class="pool-table">
                         <div class="pool-header">Pool B</div>
                         <table>
@@ -1631,7 +1797,6 @@
                         </table>
                     </div>
 
-                    <!-- Pool C -->
                     <div class="pool-table">
                         <div class="pool-header">Pool C</div>
                         <table>
@@ -1709,7 +1874,6 @@
                         </table>
                     </div>
 
-                    <!-- Pool D -->
                     <div class="pool-table">
                         <div class="pool-header">Pool D</div>
                         <table>
@@ -1787,8 +1951,276 @@
                         </table>
                     </div>
                 </div>
-              <!-- Bottom Navigation -->
-    <div class="bottom-nav">
+            </div> <div class="tournament-content" id="nile-special-content">
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">Match Days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Teams</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                        <div class="stat-value">892</div>
+                        <div class="stat-label">Total Tries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Matches Left</div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h3><i class="fas fa-calendar-day"></i> Upcoming Fixtures</h3>
+                    <a href="#" class="view-all">Full Schedule <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="fixtures-container">
+                    <div class="fixture-card">
+                        <div class="fixture-date">Saturday • 4:30 PM • Kyadondo Rugby Club</div>
+                        <div class="match-info">
+                            <div class="team">
+                                <div class="team-logo" style="background-image: url('photos/HeathensLogo.jpg')"></div>
+                                <div class="team-name">Heathens</div>
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team">
+                                <div class="team-name">Kobs</div>
+                                <div class="team-logo" style="background-image: url('photos/KobsLogo.jpg')"></div>
+                            </div>
+                        </div>
+                        <div class="match-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Kampala</span>
+                            <span><i class="fas fa-tv"></i> Live on NBS Sport</span>
+                        </div>
+                    </div>
+                    <div class="fixture-card">
+                        <div class="fixture-date">Sunday • 4:00 PM • Kings Park Arena</div>
+                        <div class="match-info">
+                            <div class="team">
+                                <div class="team-logo" style="background-image: url('photos/PiratesLogo.jpg')"></div>
+                                <div class="team-name">Pirates</div>
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team">
+                                <div class="team-name">Buffaloes</div>
+                                <div class="team-logo" style="background-image: url('photos/BuffaloesLogo.jpg')"></div>
+                            </div>
+                        </div>
+                        <div class="match-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Bweyogerere</span>
+                            <span><i class="fas fa-tv"></i> Live on Sanyuka TV</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h3><i class="fas fa-list-ol"></i> League Standings</h3>
+                    <a href="#" class="view-all">Full Table <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="standings-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Team</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>D</th>
+                                <th>L</th>
+                                <th>BP</th>
+                                <th>PTS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="rank">1</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/PiratesLogo.jpg')"></div>
+                                        <span>Pirates</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>11</td>
+                                <td>0</td>
+                                <td>2</td>
+                                <td>9</td>
+                                <td><strong>53</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">2</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/HeathensLogo.jpg')"></div>
+                                        <span>Heathens</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>10</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>8</td>
+                                <td><strong>50</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">3</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/KobsLogo.jpg')"></div>
+                                        <span>Kobs</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>9</td>
+                                <td>0</td>
+                                <td>4</td>
+                                <td>11</td>
+                                <td><strong>47</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">4</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/BuffaloesLogo.jpg')"></div>
+                                        <span>Buffaloes</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>7</td>
+                                <td>1</td>
+                                <td>5</td>
+                                <td>6</td>
+                                <td><strong>36</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">5</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/RhinosLogo.jpg')"></div>
+                                        <span>Rhinos</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>6</td>
+                                <td>0</td>
+                                <td>7</td>
+                                <td>7</td>
+                                <td><strong>31</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">6</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/WarriorsLogo.jpg')"></div>
+                                        <span>Warriors</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>5</td>
+                                <td>1</td>
+                                <td>7</td>
+                                <td>5</td>
+                                <td><strong>27</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">7</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/MonksLogo.jpg')"></div>
+                                        <span>Mongers</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>4</td>
+                                <td>1</td>
+                                <td>8</td>
+                                <td>6</td>
+                                <td><strong>24</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">8</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/RamsLogo.jpg')"></div>
+                                        <span>Rams</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>3</td>
+                                <td>0</td>
+                                <td>10</td>
+                                <td>4</td>
+                                <td><strong>16</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">9</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/ImpalaLogo.jpg')"></div>
+                                        <span>Impala</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>2</td>
+                                <td>0</td>
+                                <td>11</td>
+                                <td>5</td>
+                                <td><strong>13</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank">10</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="mini-logo" style="background-image: url('photos/HipposLogo.jpg')"></div>
+                                        <span>Hippos</span>
+                                    </div>
+                                </td>
+                                <td>13</td>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>12</td>
+                                <td>3</td>
+                                <td><strong>7</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tournament-content" id="sevens-content">
+                <div class="section-header">
+                    <h3><i class="fas fa-running"></i> Sevens Circuit Content</h3>
+                </div>
+                <div class="stat-card" style="background: var(--card-bg); padding: 2rem;">
+                    <p style="text-align: center; color: var(--text-muted);">Content for Sevens Circuit goes here...</p>
+                </div>
+            </div>
+
+            <div class="tournament-content" id="womens-content">
+                <div class="section-header">
+                    <h3><i class="fas fa-venus"></i> Women's League Content</h3>
+                </div>
+                <div class="stat-card" style="background: var(--card-bg); padding: 2rem;">
+                    <p style="text-align: center; color: var(--text-muted);">Content for Women's League goes here...</p>
+                </div>
+            </div>
+
+            <div class="tournament-content" id="regional-content">
+                <div class="section-header">
+                    <h3><i class="fas fa-map"></i> Regional Cup Content</h3>
+                </div>
+                <div class="stat-card" style="background: var(--card-bg); padding: 2rem;">
+                    <p style="text-align: center; color: var(--text-muted);">Content for Regional Cup goes here...</p>
+                </div>
+            </div>
+
+        </div> </div> <div class="bottom-nav">
+            
         <div class="nav-item active" data-page="home">
             <i class="fas fa-home"></i>
             <span>Home</span>
@@ -1805,17 +2237,16 @@
             <i class="fas fa-chart-bar"></i>
             <span>Stats</span>
         </div>
-        <div class="nav-item" data-page="news">
+        <a href="news.html" class="nav-item">
             <i class="fas fa-newspaper"></i>
             <span>News</span>
-        </div>
+        </a>
         <div class="nav-item" data-page="more">
             <i class="fas fa-bars"></i>
             <span>More</span>
         </div>
     </div>
 
-    <!-- Sliding More Menu Overlay -->
     <div class="more-menu-overlay">
         <div class="more-menu-content">
             <div class="more-menu-header">
@@ -1840,7 +2271,7 @@
                     <span>Settings</span>
                     <i class="fas fa-chevron-right"></i>
                 </a>
-                <a href="#fantasy" class="more-menu-item">
+                <a href="fantasy.html" class="more-menu-item">
                     <i class="fas fa-trophy"></i>
                     <span>Play Fantasy</span>
                     <i class="fas fa-chevron-right"></i>
@@ -1854,7 +2285,5 @@
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Home Page -->
-        <div class="page-content active" id="home">
+</body>
+</html>
