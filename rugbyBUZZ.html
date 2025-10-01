@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Rugby - Your Rugby Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0066CC;
+            --secondary-blue: #004C99;
+            --light-blue: #3399FF;
+            --accent-blue: #00BFFF;
+            --dark-bg: #0A1628;
+            --card-bg: #132337;
+            --text-light: #E8F1F8;
+            --text-muted: #8B9EB3;
+            --success: #00D084;
+            --warning: #FFB800;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0F1F35 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .search-bar {
+            position: relative;
+            display: none;
+        }
+
+        .search-bar input {
+            padding: 0.8rem 3rem 0.8rem 1.2rem;
+            border-radius: 50px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 300px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            width: 350px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Mobile Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--secondary-blue) 100%);
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0.8rem;
+            box-shadow: 0 -4px 20px rgba(0, 102, 204, 0.4);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0.5rem 0.6rem;
+            border-radius: 12px;
+            color: var(--text-muted);
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .nav-item.active {
+            color: var(--accent-blue);
+            background: rgba(0, 191, 255, 0.1);
+        }
+
+        .nav-item:hover {
+            transform: translateY(-3px);
+            color: var(--light-blue);
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+        }
+
+        .nav-item span {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 500px;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            box-shadow: 0 10px 40px rgba(0, 102, 204, 0.4);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 3rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--success);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+        }
+
+        /* Global Scrollbar Styles */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) rgba(0, 102, 204, 0.1);
+        }
+
+        /* Webkit scrollbar styles - global */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(0, 191, 255, 0.05) 100%);
+            border-radius: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+            border-radius: 8px;
+            border: 2px solid var(--dark-bg);
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-blue) 100%);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.4);
+        }
+
+        /* Tournament Selector specific styles */
+        .tournament-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            padding-right: 5px; /* Add padding for scrollbar */
+        }
+
+        /* Tournament selector specific scrollbar */
+        .tournament-selector::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .tournament-selector::-webkit-scrollbar-track {
+            background: linear-gradient(90deg, rgba(0, 102, 204, 0.05) 0%, rgba(0, 191, 255, 0.05) 100%);
+        }
+
+        .tournament-selector::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+            border: 2px solid var(--dark-bg);
+        }
+
+        .tournament-btn {
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            border: 2px solid var(--primary-blue);
+            background: var(--card-bg);
+            color: var(--text-light);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .tournament-btn span {
+            display: block;
+            width: 100%;
+            white-space: normal;
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+
+        .tournament-btn i {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+        }
+
+        .tournament-btn.active {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            border-color: var(--accent-blue);
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        .tournament-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        }
+
+        /* Tournament Content */
+        .tournament-content {
+            display: none;
+        }
+
+        .tournament-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-header h3 i {
+            color: var(--accent-blue);
+        }
+
+        .view-all {
+            color: var(--light-blue);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            background: rgba(51, 153, 255, 0.1);
+        }
+
+        .view-all:hover {
+            background: rgba(51, 153, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        /* News Grid */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .news-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 102, 204, 0.4);
+        }
+
+        .news-card-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .news-card-image.placeholder {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+        }
+
+        .news-card-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 100%);
+        }
+
+        .news-card-content {
+            padding: 1.5rem;
+        }
+
+        .news-category {
+            display: inline-block;
+            background: rgba(0, 191, 255, 0.2);
+            color: var(--accent-blue);
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .news-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .news-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Fixtures & Results */
+        .fixtures-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .fixture-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.8rem;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .fixture-card:hover {
+            border-color: var(--primary-blue);
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 102, 204, 0.3);
+        }
+
+        .fixture-date {
+            text-align: center;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .match-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .team-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .team-logo.placeholder {
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--primary-blue) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+
+        .team-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .vs {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin: 0 1rem;
+        }
+
+        .score {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent-blue);
+        }
+
+        .match-details {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Standings Table */
+        .standings-table {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 3rem;
+        }
+
+        .standings-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .standings-table thead {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+        }
+
+        .standings-table th {
+            padding: 1.2rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .standings-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .standings-table tr {
+            transition: all 0.3s;
+        }
+
+        .standings-table tbody tr:hover {
+            background: rgba(0, 102, 204, 0.1);
+        }
+
+        .rank {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+        }
+
+        .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 700;
+        }
+
+        .mini-logo {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+        }
+        
+        .mini-logo.placeholder {
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--primary-blue) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 900;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--secondary-blue) 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.4);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Filter Buttons */
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            border: 2px solid var(--primary-blue);
+            background: transparent;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--primary-blue);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
+        }
+
+        /* Page Content */
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .search-bar {
+                display: block;
+            }
+
+            .bottom-nav {
+                display: none;
+            }
+
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .hero {
+                height: 400px;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fixtures-container {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .standings-table {
+                overflow-x: auto;
+            }
+
+            .logo-text h1 {
+                font-size: 1.2rem;
+            }
+
+            .logo-text p {
+                font-size: 0.7rem;
+            }
+
+            .logo i {
+                font-size: 1.8rem;
+            }
+
+            .tournament-btn {
+                min-width: 120px;
+                padding: 0.8rem 1.2rem;
+            }
+        }
+
+        /* ============================================
+   POOL STANDINGS STYLES - DESKTOP & MOBILE
+   ============================================ */
+
+/* Pool Grid Container */
+.pools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+/* Individual Pool Table Card */
+.pool-table {
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.pool-table:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.4);
+}
+
+/* Pool Header */
+.pool-header {
+    background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+    padding: 1.2rem;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+}
+
+/* Pool Table Styles */
+.pool-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pool-table thead {
+    background: rgba(0, 102, 204, 0.2);
+}
+
+.pool-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+.pool-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+}
+
+.pool-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.pool-table tbody tr:hover {
+    background: rgba(0, 102, 204, 0.1);
+    cursor: pointer;
+}
+
+/* Highlight first place team */
+.pool-table tbody tr:first-child {
+    background: rgba(0, 191, 255, 0.1);
+    border-left: 4px solid var(--accent-blue);
+}
+
+.pool-table tbody tr:first-child:hover {
+    background: rgba(0, 191, 255, 0.15);
+}
+
+/* Rank Column Styling */
+.rank {
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--accent-blue);
+    min-width: 30px;
+    display: inline-block;
+}
+
+/* Team Cell with Logo */
+.team-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+        .mini-logo {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 6px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .mini-logo::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 6px;
+            box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+        }/* Stats Columns */
+.pool-table td:nth-child(3),
+.pool-table td:nth-child(4),
+.pool-table td:nth-child(5) {
+    text-align: center;
+    font-weight: 600;
+}
+
+.pool-table th:nth-child(3),
+.pool-table th:nth-child(4),
+.pool-table th:nth-child(5) {
+    text-align: center;
+}
+
+/* Points Column - Make it stand out */
+.pool-table td:last-child {
+    font-weight: 800;
+    color: var(--accent-blue);
+    font-size: 1.1rem;
+}
+
+
+/* ============================================
+   RESPONSIVE STYLES - TABLET
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .pools-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .pool-header {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+    
+    .pool-table th,
+    .pool-table td {
+        padding: 0.8rem;
+    }
+}
+
+
+/* ============================================
+   RESPONSIVE STYLES - MOBILE
+   ============================================ */
+
+@media (max-width: 767px) {
+    /* Single column layout on mobile */
+    .pools-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Make pool table scrollable horizontally if needed */
+    .pool-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Smaller header on mobile */
+    .pool-header {
+        font-size: 1rem;
+        padding: 1rem 0.5rem;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Compact table styling */
+    .pool-table table {
+        min-width: 100%;
+        font-size: 0.9rem;
+    }
+    
+    .pool-table th {
+        padding: 0.7rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .pool-table td {
+        padding: 0.7rem 0.5rem;
+    }
+    
+    /* Smaller rank */
+    .rank {
+        font-size: 1rem;
+        min-width: 25px;
+    }
+    
+    /* Compact team cell */
+        .team-cell {
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .mini-logo {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+        }    /* Hide team name on very small screens, show only logo and abbreviation */
+    @media (max-width: 400px) {
+        .team-cell span {
+            font-size: 0.8rem;
+        }
+    }
+    
+    /* Smaller points column */
+    .pool-table td:last-child {
+        font-size: 1rem;
+    }
+    
+    /* Remove hover transform on mobile for better performance */
+    .pool-table:hover {
+        transform: none;
+    }
+    
+    /* First place highlight - reduce border on mobile */
+    .pool-table tbody tr:first-child {
+        border-left: 3px solid var(--accent-blue);
+    }
+}
+
+
+/* ============================================
+   RESPONSIVE STYLES - EXTRA SMALL MOBILE
+   ============================================ */
+
+@media (max-width: 400px) {
+    .pools-grid {
+        gap: 1rem;
+        padding: 0 0.5rem;
+    }
+    
+    .pool-header {
+        font-size: 0.9rem;
+        padding: 0.8rem 0.5rem;
+    }
+    
+    .pool-table th,
+    .pool-table td {
+        padding: 0.6rem 0.3rem;
+        font-size: 0.8rem;
+    }
+    
+    .pool-table th {
+        font-size: 0.65rem;
+    }
+    
+    .team-cell {
+        gap: 0.4rem;
+        font-size: 0.8rem;
+    }
+    
+    .mini-logo {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        font-size: 0.7rem;
+    }
+}
+
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Add smooth scrolling for mobile tables */
+.pool-table {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for pool tables on mobile */
+.pool-table::-webkit-scrollbar {
+    height: 6px;
+}
+
+.pool-table::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.pool-table::-webkit-scrollbar-thumb {
+    background: var(--primary-blue);
+    border-radius: 10px;
+}
+
+.pool-table::-webkit-scrollbar-thumb:hover {
+    background: var(--light-blue);
+}
+
+/* Loading state (optional - for future use) */
+.pool-table.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Empty state styling (optional - for future use) */
+.pool-table-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Sliding More Menu Styles */
+.more-menu-overlay {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 22, 40, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.more-menu-overlay.active {
+    right: 0;
+}
+
+.more-menu-content {
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--dark-bg) 100%);
+    padding: 2rem;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.more-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.more-menu-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+.close-menu {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: all 0.3s;
+    border-radius: 50%;
+}
+
+.close-menu:hover {
+    color: var(--text-light);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.more-menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.more-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    color: var(--text-light);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.more-menu-item:hover {
+    background: rgba(0, 102, 204, 0.2);
+    transform: translateX(5px);
+}
+
+.more-menu-item i:first-child {
+    font-size: 1.2rem;
+    width: 30px;
+    color: var(--accent-blue);
+}
+
+.more-menu-item span {
+    flex: 1;
+    font-weight: 600;
+}
+
+.more-menu-item i:last-child {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .more-menu-content {
+        max-width: 100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const moreButton = document.querySelector('[data-page="more"]');
+            const overlay = document.querySelector('.more-menu-overlay');
+            const closeButton = document.querySelector('.close-menu');
+
+            // Open menu
+            moreButton.addEventListener('click', function() {
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            });
+
+            // Close menu
+            closeButton.addEventListener('click', function() {
+                overlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            });
+
+            // Close menu when clicking outside
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Prevent closing when clicking inside menu content
+            const menuContent = document.querySelector('.more-menu-content');
+            menuContent.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-trophy"></i>
+                <div class="logo-text">
+                    <h1>Keyboard Rugby</h1>
+                    <p>Your Rugby Hub</p>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search news, teams, fixtures...">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Home Page -->
+        <div class="page-content active" id="home">
+            <!-- Hero Section -->
+            <div class="hero" style="background-image: url('photos/DegziOnFire.jpg'); background-size: cover; background-position: center;">
+                <div class="hero-content">
+                    <span class="hero-badge">BREAKING NEWS</span>
+                    <h2>Kampala Kings Secure Historic Victory in Uganda Cup Final</h2>
+                    <p>In a thrilling display of rugby excellence, Kampala Kings defeated defending champions Entebbe Warriors 34-28 to claim their first Uganda Cup title.</p>
+                </div>
+            </div>
+
+            <!-- Tournament Selector -->
+            <div class="tournament-selector">
+                <button class="tournament-btn active" data-tournament="uganda-cup">
+                    <i class="fas fa-trophy"></i>
+                    <span>Uganda Cup</span>
+                </button>
+                <button class="tournament-btn" data-tournament="nile-special">
+                    <i class="fas fa-beer"></i>
+                    <span>Nile Special League</span>
+                </button>
+                <button class="tournament-btn" data-tournament="sevens">
+                    <i class="fas fa-running"></i>
+                    <span>Sevens Circuit</span>
+                </button>
+                <button class="tournament-btn" data-tournament="womens">
+                    <i class="fas fa-venus"></i>
+                    <span>Women's League</span>
+                </button>
+                <button class="tournament-btn" data-tournament="regional">
+                    <i class="fas fa-map"></i>
+                    <span>Regional Cup</span>
+                </button>
+            </div>
+
+            <!-- Uganda Cup Content -->
+            <div class="tournament-content active" id="uganda-cup-content">
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Matches Played</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Teams Competing</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                        <div class="stat-value">456</div>
+                        <div class="stat-label">Total Points Scored</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Matches Remaining</div>
+                    </div>
+                </div>
+
+                <!-- Latest News -->
+                <div class="section-header">
+                    <h3><i class="fas fa-newspaper"></i> Latest News</h3>
+                    <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="news-grid">
+                    <div class="news-card">
+                        <div class="news-card-image" style="background-image: url('photos/PirartesCup.jpg')"></div>
+                        <div class="news-card-content">
+                            <span class="news-category">MATCH REPORT</span>
+                            <h4>Kampala Kings Crowned Champions</h4>
+                            <p>A sensational second-half performance saw Kampala Kings overturn a 14-point deficit to claim victory.</p>
+                            <div class="news-meta">
+                                <span><i class="far fa-clock"></i> 2 hours ago</span>
+                                <span><i class="far fa-eye"></i> 2.5k views</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-card">
+                        <div class="news-card-image" style="background-image: url('photos/PiratesJerry.jpg')"></div>
+                        <div class="news-card-content">
+                            <span class="news-category">PLAYER SPOTLIGHT</span>
+                            <h4>Rising Star: Meet Samuel Okello</h4>
+                            <p>The young fly-half from Jinja Rhinos is taking the championship by storm with his exceptional playmaking.</p>
+                            <div class="news-meta">
+                                <span><i class="far fa-clock"></i> 5 hours ago</span>
+                                <span><i class="far fa-eye"></i> 1.8k views</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-card">
+                        <div class="news-card-image" style="background-image: url('photos/PiratesSydo8.jpg')"></div>
+                        <div class="news-card-content">
+                            <span class="news-category">ANALYSIS</span>
+                            <h4>Title Race Intensifies</h4>
+                            <p>With four matches remaining, three teams are still in contention for the Uganda Cup trophy.</p>
+                            <div class="news-meta">
+                                <span><i class="far fa-clock"></i> 1 day ago</span>
+                                <span><i class="far fa-eye"></i> 3.2k views</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Matches -->
+                <div class="section-header">
+                    <h3><i class="fas fa-calendar-day"></i> Today's Matches</h3>
+                    <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="fixtures-container">
+                    <div class="fixture-card">
+                        <div class="fixture-date">Today • 3:00 PM • Legends Rugby Ground</div>
+                        <div class="match-info">
+                            <div class="team">
+                                <div class="team-logo" style="background-image: url('photos/Stanbic.jpg')"></div>
+                                <div class="team-name">Masaka Hawks</div>
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team">
+                                <div class="team-name">Gulu Giants</div>
+                                <div class="team-logo" style="background-image: url('photos/NileSpecial.jpg')"></div>
+                            </div>
+                        </div>
+                        <div class="match-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Kampala</span>
+                            <span><i class="fas fa-tv"></i> Live on NBS Sport</span>
+                        </div>
+                    </div>
+                    <div class="fixture-card">
+                        <div class="fixture-date">Today • 5:30 PM • Mandela Stadium</div>
+                        <div class="match-info">
+                            <div class="team">
+                                <div class="team-logo" style="background-image: url('photos/NileSpecial.jpg')"></div>
+                                <div class="team-name">Jinja Rhinos</div>
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team">
+                                <div class="team-name">Mbarara Bulls</div>
+                                <div class="team-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                            </div>
+                        </div>
+                        <div class="match-details">
+                            <span><i class="fas fa-map-marker-alt"></i> Namboole</span>
+                            <span><i class="fas fa-tv"></i> Live on Sanyuka TV</span>
+                        </div>
+                    </div>
+                </div>
+                 
+                <!-- Pool Standings -->
+                <div class="section-header">
+                    <h3><i class="fas fa-trophy"></i> Pool Standings</h3>
+                    <a href="#" class="view-all">Full Tables <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="pools-grid">
+                    <!-- Pool A -->
+                    <div class="pool-table">
+                        <div class="pool-header">Pool A</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team</th>
+                                    <th>P</th>
+                                    <th>W</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="rank">1</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Kampala Kings</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>5</td>
+                                    <td><strong>22</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">2</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Jinja Rhinos</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>4</td>
+                                    <td><strong>18</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">3</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Masaka Hawks</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>3</td>
+                                    <td><strong>14</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">4</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Fort Portal Tigers</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>2</td>
+                                    <td><strong>9</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">5</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Lira Stallions</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>1</td>
+                                    <td><strong>5</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pool B -->
+                    <div class="pool-table">
+                        <div class="pool-header">Pool B</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team</th>
+                                    <th>P</th>
+                                    <th>W</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="rank">1</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Entebbe Warriors</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>5</td>
+                                    <td><strong>21</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">2</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Mbarara Bulls</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>4</td>
+                                    <td><strong>17</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">3</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Kabale Buffaloes</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>3</td>
+                                    <td><strong>13</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">4</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Arua Rebels</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>2</td>
+                                    <td><strong>8</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">5</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Soroti Lions</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>0</td>
+                                    <td><strong>2</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pool C -->
+                    <div class="pool-table">
+                        <div class="pool-header">Pool C</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team</th>
+                                    <th>P</th>
+                                    <th>W</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="rank">1</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Gulu Giants</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>5</td>
+                                    <td><strong>23</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">2</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Mbale Warriors</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>4</td>
+                                    <td><strong>19</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">3</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Hoima Cheetahs</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>3</td>
+                                    <td><strong>15</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">4</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Tororo Titans</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>1</td>
+                                    <td><strong>7</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">5</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Kasese Eagles</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>1</td>
+                                    <td><strong>4</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pool D -->
+                    <div class="pool-table">
+                        <div class="pool-header">Pool D</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team</th>
+                                    <th>P</th>
+                                    <th>W</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="rank">1</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Wakiso Wolves</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>5</td>
+                                    <td><strong>24</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">2</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Ntungamo Sharks</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>4</td>
+                                    <td><strong>16</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">3</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Mityana Panthers</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>3</td>
+                                    <td><strong>12</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">4</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Busia Leopards</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>2</td>
+                                    <td><strong>10</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="rank">5</span></td>
+                                    <td>
+                                        <div class="team-cell">
+                                            <div class="mini-logo" style="background-image: url('photos/Uru.jpg')"></div>
+                                            <span>Iganga Bears</span>
+                                        </div>
+                                    </td>
+                                    <td>6</td>
+                                    <td>1</td>
+                                    <td><strong>6</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+              <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="home">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" data-page="fixtures">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Fixtures</span>
+        </div>
+        <div class="nav-item" data-page="standings">
+            <i class="fas fa-trophy"></i>
+            <span>Standings</span>
+        </div>
+        <div class="nav-item" data-page="stats">
+            <i class="fas fa-chart-bar"></i>
+            <span>Stats</span>
+        </div>
+        <div class="nav-item" data-page="news">
+            <i class="fas fa-newspaper"></i>
+            <span>News</span>
+        </div>
+        <div class="nav-item" data-page="more">
+            <i class="fas fa-bars"></i>
+            <span>More</span>
+        </div>
+    </div>
+
+    <!-- Sliding More Menu Overlay -->
+    <div class="more-menu-overlay">
+        <div class="more-menu-content">
+            <div class="more-menu-header">
+                <h2>More Options</h2>
+                <button class="close-menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="more-menu-items">
+                <a href="#settings" class="more-menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <a href="#fantasy" class="more-menu-item">
+                    <i class="fas fa-trophy"></i>
+                    <span>Play Fantasy</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <a href="#contact" class="more-menu-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact Us</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Home Page -->
+        <div class="page-content active" id="home">
